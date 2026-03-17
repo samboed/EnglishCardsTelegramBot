@@ -54,7 +54,7 @@ def show_collection_words(bot: telebot.TeleBot, message: telebot.types.Message, 
          in enumerate(fixed_words, start=1)])
 
     if not unknown_words_text :
-        unknown_words_text = "\t\t~>"
+        unknown_words_text = "\t\t~"
     if not learned_words_text :
         learned_words_text = "\t\t~"
     if not fixed_words_text :
@@ -95,11 +95,11 @@ def selecting_collection(bot: telebot.TeleBot, call: telebot.types.CallbackQuery
 
     markup = telebot.types.InlineKeyboardMarkup()
 
-    for collection_name, owner_id in collection_data_list[__MAX_WORD_COLLS_PER_PAGE * (num_page - 1)
+    for collection_name in collection_data_list[__MAX_WORD_COLLS_PER_PAGE * (num_page - 1)
     :__MAX_WORD_COLLS_PER_PAGE * num_page]:
         keyboard_button = telebot.types.InlineKeyboardButton(collection_name.capitalize(),
                                                              callback_data=f"{callback_coll_selected_prefix}"
-                                                                           f"_{collection_name}_{owner_id}")
+                                                                           f"_{collection_name}")
         markup.add(keyboard_button)
 
     inline_button_prev_page = telebot.types.InlineKeyboardButton("⬅️",

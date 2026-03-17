@@ -7,8 +7,9 @@ from pathlib import Path
 
 from src.db.common import get_user_id
 from src.db.service import create_database, create_tables
-from src.db.users import add_new_user
-from src.db.collection import (add_collection, del_user_collection, get_available_collections, get_collection_words,
+from src.db.users import add_new_user, ADMIN_USER_ID
+from src.db.collection import (add_collection, add_common_collections_for_user, add_collection_for_user,
+                               del_user_collection, get_available_collections, get_collection_words,
                                add_words, add_word_pairs, del_words)
 from src.db.user_progress import upgrade_user_progress
 from src.db.repeat_session import (add_repeat_session_words, del_repeat_session_data, get_repeat_session_data,
@@ -40,7 +41,7 @@ class Database:
         return create_tables(self.__conn, PATH_TO_CREATE_TABLES_SQL)
 
     def __add_admin_user(self):
-        self.add_new_user(0)
+        self.add_new_user(None, ADMIN_USER_ID)
 
     def __add_default_collections(self):
         for file_path in glob.glob(os.path.join(PATH_DEFAULT_COLLECTIONS, f'*.csv')):
@@ -48,17 +49,23 @@ class Database:
                 reader = csv.reader(table_csv_file, delimiter=";")
                 word_pairs_list = list(reader)
                 collection_name = str(Path(os.path.basename(file_path)).with_suffix('')).strip().lower()
-                self.add_collection(0, collection_name)
-                add_word_pairs(self.__conn, 0, collection_name, word_pairs_list)
+                self.add_collection(collection_name, None, user_id=ADMIN_USER_ID)
+                add_word_pairs(self.__conn, None, collection_name, word_pairs_list, ADMIN_USER_ID)
 
     def __get_user_id(self, user_telegram_id):
         return get_user_id(self.__conn, user_telegram_id)
 
-    def add_new_user(self, user_telegram_id):
-        add_new_user(self.__conn, user_telegram_id)
+    def add_new_user(self, user_telegram_id, user_id=None):
+        add_new_user(self.__conn, user_telegram_id,  user_id)
 
-    def add_collection(self, user_telegram_id, collection_name):
-        return add_collection(self.__conn, user_telegram_id, collection_name)
+    def add_collection(self, collection_name, user_telegram_id, user_id=None):
+        return add_collection(self.__conn, collection_name, user_telegram_id, user_id)
+
+    def add_common_collections_for_user(self, user_telegram_id):
+        return add_common_collections_for_user(self.__conn, user_telegram_id)
+
+    def add_collection_for_user(self, user_telegram_id, collection_name):
+        return add_collection_for_user(self.__conn, user_telegram_id, collection_name)
 
     def del_collection(self, user_telegram_id, collection_name):
         return del_user_collection(self.__conn, user_telegram_id, collection_name)
@@ -66,8 +73,8 @@ class Database:
     def get_available_collections(self, user_telegram_id):
         return get_available_collections(self.__conn, user_telegram_id)
 
-    def get_collection_words(self, collection_name, owner_id, zero_level_mastery=None, limit=None):
-        return get_collection_words(self.__conn, collection_name, owner_id, zero_level_mastery, limit)
+    def get_collection_words(self, collection_name, user_telegram_id, zero_level_mastery=None, limit=None):
+        return get_collection_words(self.__conn, collection_name, user_telegram_id, zero_level_mastery, limit)
 
     def add_words(self, user_telegram_id, collection_name, ru_word, en_word):
         return add_words(self.__conn, user_telegram_id, collection_name, ru_word, en_word)

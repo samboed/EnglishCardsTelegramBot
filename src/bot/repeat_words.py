@@ -120,6 +120,7 @@ def start_guess_words(bot: telebot.TeleBot, message: telebot.types.Message, user
                                        goal_ru_word, inline_button_next, inline_button_back, False)
     else:
         word_pair, _ = db.get_repeat_session_data(user_id)
+        db.del_repeat_session_data(user_id)
 
         message_text = (f"Вы повторили слова в кол-ве "
                         f"{len(word_pair)} 🤓")

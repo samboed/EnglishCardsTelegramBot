@@ -56,7 +56,7 @@ def get_qty_nonstop_repeat_days(conn: psycopg2.extensions.connection, user_teleg
            SELECT
              study_date - ROW_NUMBER() OVER (ORDER BY study_date) * INTERVAL '1 days' AS grp
            FROM UsersActivity
-           WHERE user_id = 1
+           WHERE user_id = %s
          ),
          qty_days AS (
           SELECT COUNT(*) AS qty

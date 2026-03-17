@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS Users (
     user_id SERIAL8 PRIMARY KEY,
-    telegram_uid INT8 UNIQUE NOT NULL
+    telegram_uid INT8 UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS UsersActivity (
@@ -16,6 +16,12 @@ CREATE TABLE IF NOT EXISTS Collections (
     owner_id INT8 REFERENCES Users(user_id),
     name VARCHAR(120) NOT NULL,
     CONSTRAINT UNIQUE_CollectionNameByOwner UNIQUE (name, owner_id)
+);
+
+CREATE TABLE IF NOT EXISTS CollectionsUsers (
+    user_id INT8 NOT NULL REFERENCES Users(user_id),
+    collection_id INT NOT NULL REFERENCES Collections(collection_id),
+    CONSTRAINT PK_CollectionsUsers PRIMARY KEY (user_id, collection_id)
 );
 
 CREATE TABLE IF NOT EXISTS RuWords (
@@ -42,6 +48,7 @@ CREATE TABLE IF NOT EXISTS UsersProgress (
     en_word_id INT8 NOT NULL,
     lvl_mastery INT2 NOT NULL DEFAULT 0,
     last_repeated TIMESTAMP,
+    CONSTRAINT UNIQUE_UsersProgress UNIQUE (user_id, collection_id, ru_word_id, en_word_id),
     FOREIGN KEY (collection_id, ru_word_id, en_word_id)
     REFERENCES CollectionsWords(collection_id, ru_word_id, en_word_id) ON DELETE CASCADE
 );
