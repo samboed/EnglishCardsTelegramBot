@@ -2,14 +2,15 @@ import psycopg2
 
 from src.db.common import get_user_id
 
-def add_repeat_session_words(conn: psycopg2.extensions.connection, user_telegram_id, word_pairs_keys):
+def add_repeat_session_words(conn: psycopg2.extensions.connection, user_telegram_id: int,
+                             word_pairs_keys: list[tuple[int, int, int]]) -> bool:
     query = """
     INSERT INTO UsersRepeatSession (user_id, collection_id, ru_word_id, en_word_id) 
-    VALUES (%s, %s, %s, %s);
+     VALUES (%s, %s, %s, %s);
     """
 
     user_id = get_user_id(conn, user_telegram_id)
-    if user_id is False:
+    if not user_id:
         return False
 
     insert_data = [(user_id, collection_id, ru_word_id, en_word_id)
@@ -26,14 +27,15 @@ def add_repeat_session_words(conn: psycopg2.extensions.connection, user_telegram
 
     return True
 
-def del_repeat_session_data(conn: psycopg2.extensions.connection, user_telegram_id, word_pairs_keys=None):
+def del_repeat_session_data(conn: psycopg2.extensions.connection, user_telegram_id: int,
+                            word_pairs_keys: list[tuple[int, int, int]] = None) -> bool:
     query = """
     DELETE FROM UsersRepeatSession
      WHERE user_id = %s;
     """
 
     user_id = get_user_id(conn, user_telegram_id)
-    if user_id is False:
+    if not user_id:
         return False
 
     variables = [user_id]
@@ -52,8 +54,10 @@ def del_repeat_session_data(conn: psycopg2.extensions.connection, user_telegram_
 
     return True
 
-def get_repeat_session_data(conn: psycopg2.extensions.connection, user_telegram_id, word_pairs_exception=None, ru_word_repeated=None,
-                            en_word_repeated=None, limit=None):
+def get_repeat_session_data(conn: psycopg2.extensions.connection, user_telegram_id: int,
+                            word_pairs_exception: tuple[int, int, int] = None,
+                            ru_word_repeated: bool = None, en_word_repeated: bool = None,
+                            limit: int = None) -> tuple[list[tuple[str, str]], list[tuple[int, int, int]]] | bool:
     query = """
     SELECT rw.word, ew.word, urs.collection_id, urs.ru_word_id, urs.en_word_id
      FROM (SELECT * 
@@ -71,7 +75,7 @@ def get_repeat_session_data(conn: psycopg2.extensions.connection, user_telegram_
     """
 
     user_id = get_user_id(conn, user_telegram_id)
-    if user_id is False:
+    if not user_id:
         return False
 
     variables = [user_id]
@@ -110,8 +114,15 @@ def get_repeat_session_data(conn: psycopg2.extensions.connection, user_telegram_
 
     return word_pairs, word_pairs_keys
 
-def update_repeat_session_data(conn: psycopg2.extensions.connection, user_telegram_id, word_pairs_keys, ru_word_repeated=None,
-                               en_word_repeated=None, was_mistake=None):
+def update_repeat_session_data(conn: psycopg2.extensions.connection, user_telegram_id: int,
+                               word_pairs_keys: tuple[int, int, int], ru_word_repeated: bool = None,
+                               en_word_repeated: bool = None, was_mistake: bool = None) -> bool:
+    query = """
+    UPDATE UsersRepeatSession
+     SET {0}
+    WHERE user_id = %s AND (collection_id, ru_word_id, en_word_id) IN ((%s, %s, %s)); 
+    """
+
     variables = []
     query_set_list = []
     if ru_word_repeated is not None:
@@ -126,15 +137,11 @@ def update_repeat_session_data(conn: psycopg2.extensions.connection, user_telegr
 
     query_set = ", ".join(query_set_list)
 
-    user_id = get_user_id(conn, user_telegram_id)
-    if user_id is False:
-        return False
+    query = query.format(query_set)
 
-    query = f"""
-            UPDATE UsersRepeatSession
-             SET {query_set}
-            WHERE user_id = %s AND (collection_id, ru_word_id, en_word_id) IN ((%s, %s, %s)); 
-            """
+    user_id = get_user_id(conn, user_telegram_id)
+    if not user_id:
+        return False
 
     variables.extend([user_id, *word_pairs_keys])
 

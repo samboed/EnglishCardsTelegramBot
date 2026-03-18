@@ -5,7 +5,8 @@ from src.bot.defines import CallBackData, InlineButtons
 __MAX_WORD_COLLS_PER_PAGE = 6
 __MAX_SYMBOLS_IN_ONE_MESSAGE = 4096
 
-def __generate_word_groups_by_rank(word_pairs_ranks):
+def __generate_word_groups_by_rank(word_pairs_ranks: list[tuple[str, str, int]]) \
+        -> tuple[list[tuple[str,str]], list[tuple[str,str]], list[tuple[str,str]]]:
     unknown_words = []
     learned_words = []
     fixed_words = []
@@ -20,7 +21,9 @@ def __generate_word_groups_by_rank(word_pairs_ranks):
 
     return unknown_words, learned_words, fixed_words
 
-def show_collection_sum_info(bot: telebot.TeleBot, message: telebot.types.Message, word_pairs_ranks, collection_name):
+def show_collection_sum_info(bot: telebot.TeleBot, message: telebot.types.Message,
+                             word_pairs_ranks: list[tuple[str, str, int]],
+                             collection_name: str) -> telebot.types.Message:
     unknown_words, learned_words, fixed_words = __generate_word_groups_by_rank(word_pairs_ranks)
 
     qty_unknown_words = len(unknown_words)
@@ -37,7 +40,9 @@ def show_collection_sum_info(bot: telebot.TeleBot, message: telebot.types.Messag
     new_message = bot.send_message(message.chat.id, message_text, parse_mode="HTML")
     return new_message
 
-def show_collection_words(bot: telebot.TeleBot, message: telebot.types.Message, word_pairs_ranks, collection_name):
+def show_collection_words(bot: telebot.TeleBot, message: telebot.types.Message,
+                          word_pairs_ranks: list[tuple[str, str, int]],
+                          collection_name: str) -> telebot.types.Message:
     unknown_words, learned_words, fixed_words = __generate_word_groups_by_rank(word_pairs_ranks)
 
     unknown_words_text = f"\n" .join(
@@ -83,8 +88,9 @@ def show_collection_words(bot: telebot.TeleBot, message: telebot.types.Message, 
 
     return last_message
 
-def selecting_collection(bot: telebot.TeleBot, call: telebot.types.CallbackQuery, callback_data_prefix_coll,
-                         collection_data_list, num_page, show_menu=False, add_del_coll_buttons=False):
+def selecting_collection(bot: telebot.TeleBot, call: telebot.types.CallbackQuery,
+                         callback_data_prefix_coll: str, collection_data_list: list[str], num_page: int,
+                         show_menu: bool = False, add_del_coll_buttons: bool = False):
 
     callback_coll_selected_prefix = f"{callback_data_prefix_coll}{CallBackData.COLL_SELECT}"
     callback_add = f"{callback_data_prefix_coll}{CallBackData.COLL_ADD}"
@@ -95,8 +101,8 @@ def selecting_collection(bot: telebot.TeleBot, call: telebot.types.CallbackQuery
 
     markup = telebot.types.InlineKeyboardMarkup()
 
-    for collection_name in collection_data_list[__MAX_WORD_COLLS_PER_PAGE * (num_page - 1)
-    :__MAX_WORD_COLLS_PER_PAGE * num_page]:
+    for collection_name in collection_data_list[__MAX_WORD_COLLS_PER_PAGE *
+                                                (num_page - 1) : __MAX_WORD_COLLS_PER_PAGE * num_page]:
         keyboard_button = telebot.types.InlineKeyboardButton(collection_name.capitalize(),
                                                              callback_data=f"{callback_coll_selected_prefix}"
                                                                            f"_{collection_name}")

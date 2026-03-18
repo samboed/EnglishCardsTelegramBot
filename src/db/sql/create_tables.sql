@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS Collections (
 
 CREATE TABLE IF NOT EXISTS CollectionsUsers (
     user_id INT8 NOT NULL REFERENCES Users(user_id),
-    collection_id INT NOT NULL REFERENCES Collections(collection_id),
+    collection_id INT NOT NULL REFERENCES Collections(collection_id) ON DELETE CASCADE,
     CONSTRAINT PK_CollectionsUsers PRIMARY KEY (user_id, collection_id)
 );
 
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS EnWords (
 );
 
 CREATE TABLE IF NOT EXISTS CollectionsWords (
-    collection_id INT NOT NULL REFERENCES Collections(collection_id),
+    collection_id INT NOT NULL REFERENCES Collections(collection_id) ON DELETE CASCADE,
     ru_word_id INT8 NOT NULL REFERENCES RuWords(word_id),
     en_word_id INT8 NOT NULL REFERENCES EnWords(word_id),
     CONSTRAINT PK_CollectionsWords PRIMARY KEY (collection_id, ru_word_id, en_word_id)

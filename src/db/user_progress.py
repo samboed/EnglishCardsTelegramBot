@@ -2,7 +2,8 @@ import psycopg2
 
 from src.db.common import get_user_id
 
-def upgrade_user_progress(conn: psycopg2.extensions.connection, user_telegram_id, word_pairs_keys):
+def upgrade_user_progress(conn: psycopg2.extensions.connection, user_telegram_id : int,
+                          word_pairs_keys : tuple[int, int, int]) -> bool:
     query = f"""
     INSERT INTO UsersProgress (user_id, collection_id, ru_word_id, en_word_id) 
     VALUES (%s, %s, %s, %s)
@@ -20,7 +21,7 @@ def upgrade_user_progress(conn: psycopg2.extensions.connection, user_telegram_id
     """
 
     user_id = get_user_id(conn, user_telegram_id)
-    if user_id is False:
+    if not user_id:
         return False
 
     variables = [user_id, *word_pairs_keys] * 2

@@ -10,7 +10,9 @@ __USER_SESSION_REST_RU_WORD_INDS_KEY = "rest_study_ru_words"
 __USER_SESSION_REST_EN_WORD_INDS_KEY = "rest_study_en_words"
 
 
-def __get_words_to_guess_keyboard_markup(word_pair, another_word_pairs, en_word=True):
+def __get_words_to_guess_keyboard_markup(word_pair: tuple[str, str],
+                                         another_word_pairs: list[tuple[str, str]],
+                                         en_word: bool = True) -> telebot.types.ReplyKeyboardMarkup:
     if en_word:
         pos_word = 1
     else:
@@ -35,8 +37,11 @@ def __get_words_to_guess_keyboard_markup(word_pair, another_word_pairs, en_word=
     return markup
 
 def __try_guess_word(message: telebot.types.Message, bot: telebot.TeleBot,
-                     bot_prev_message: telebot.types.Message, db: Database, word_pairs_keys, goal_word,
-                     inline_button_next, inline_button_back, en_word=True, was_mistake=None):
+                     bot_prev_message: telebot.types.Message, db: Database,
+                     word_pairs_keys: tuple[int, int, int], goal_word: str,
+                     inline_button_next: telebot.types.InlineKeyboardButton,
+                     inline_button_back: telebot.types.InlineKeyboardButton,
+                     en_word: bool = True, was_mistake: bool = None):
     clear_last_message(bot, bot_prev_message)
 
     user_id = message.from_user.id
@@ -56,13 +61,17 @@ def __try_guess_word(message: telebot.types.Message, bot: telebot.TeleBot,
 
         start_guess_words(bot, message, message.from_user.id, db, inline_button_next, inline_button_back)
     else:
-        bot.send_message(chat_id, "Неверно 😢\n"
-                                         "Попробуйте ещё раз!")
+        message_text = ("Неверно 😢\n"
+                        "Попробуйте ещё раз!")
+
+        bot.send_message(chat_id, message_text)
 
         bot.register_next_step_handler(message, __try_guess_word, bot, bot_prev_message, db, word_pairs_keys,
                                        goal_word, inline_button_next, inline_button_back, en_word, True)
 
-def __get_session_data_from_db(user_id, db: Database, one_session_data):
+def __get_session_data_from_db(user_id, db: Database,
+                               one_session_data: tuple[list[tuple[str, str]], list[tuple[int, int, int]]]) \
+        -> tuple[tuple[str, str], tuple[int, int, int], list[tuple[str, str]]]:
     word_pair, word_pairs_keys = one_session_data
     word_pair = word_pair[0]
     word_pairs_keys = word_pairs_keys[0]
@@ -75,15 +84,22 @@ def __get_session_data_from_db(user_id, db: Database, one_session_data):
 
     return word_pair, word_pairs_keys, another_word_pairs
 
-def start_guess_words(bot: telebot.TeleBot, message: telebot.types.Message, user_id, db: Database, inline_button_next,
-                      inline_button_back):
+def start_guess_words(bot: telebot.TeleBot, message: telebot.types.Message,
+                      user_id: int, db: Database, inline_button_next: telebot.types.InlineKeyboardButton,
+                      inline_button_back: telebot.types.InlineKeyboardButton):
     clear_last_message(bot, message)
+
+    chat_id = message.chat.id
 
     inline_markup = telebot.types.InlineKeyboardMarkup(row_width=1)
     keyboard_markup_message_text = "🔺▪️🔺▪️🔺▪️🔺▪️🔺"
 
-    res_get_one_session_data_no_en_word_repeated = db.get_repeat_session_data(user_id, limit=1, en_word_repeated=False)
-    res_get_one_session_data_no_ru_word_repeated = db.get_repeat_session_data(user_id, limit=1, ru_word_repeated=False)
+    res_get_one_session_data_no_en_word_repeated = db.get_repeat_session_data(user_id,
+                                                                              limit=1,
+                                                                              en_word_repeated=False)
+    res_get_one_session_data_no_ru_word_repeated = db.get_repeat_session_data(user_id,
+                                                                              limit=1,
+                                                                              ru_word_repeated=False)
     if res_get_one_session_data_no_en_word_repeated:
         word_pair, word_pairs_keys, another_word_pairs = (
             __get_session_data_from_db(user_id, db, res_get_one_session_data_no_en_word_repeated))
@@ -91,13 +107,14 @@ def start_guess_words(bot: telebot.TeleBot, message: telebot.types.Message, user
         goal_ru_word, goal_en_word = word_pair
 
         keyboard_markup = __get_words_to_guess_keyboard_markup(word_pair, another_word_pairs, True)
-        bot.send_message(message.chat.id, keyboard_markup_message_text, reply_markup=keyboard_markup)
+        bot.send_message(chat_id, keyboard_markup_message_text, reply_markup=keyboard_markup)
+
+        inline_markup.add(inline_button_back, InlineButtons.main_menu)
 
         message_text = ("Выберите перевод для слова:\n"
                         f"{goal_ru_word} 🇷🇺")
-        inline_markup.add(inline_button_back, InlineButtons.main_menu)
 
-        bot_message = bot.send_message(message.chat.id, message_text, reply_markup=inline_markup)
+        bot_message = bot.send_message(chat_id, message_text, reply_markup=inline_markup)
 
         bot.register_next_step_handler(message, __try_guess_word, bot, bot_message, db, word_pairs_keys,
                                        goal_en_word, inline_button_next, inline_button_back)
@@ -108,13 +125,14 @@ def start_guess_words(bot: telebot.TeleBot, message: telebot.types.Message, user
         goal_ru_word, goal_en_word = word_pair
 
         keyboard_markup = __get_words_to_guess_keyboard_markup(word_pair, another_word_pairs, False)
-        bot.send_message(message.chat.id, keyboard_markup_message_text, reply_markup=keyboard_markup)
+        bot.send_message(chat_id, keyboard_markup_message_text, reply_markup=keyboard_markup)
+
+        inline_markup.add(inline_button_back, InlineButtons.main_menu)
 
         message_text = ("Выберите перевод для слова:\n"
                         f"{goal_en_word} 🇬🇧")
-        inline_markup.add(inline_button_back, InlineButtons.main_menu)
 
-        bot_message = bot.send_message(message.chat.id, message_text, reply_markup=inline_markup)
+        bot_message = bot.send_message(chat_id, message_text, reply_markup=inline_markup)
 
         bot.register_next_step_handler(message, __try_guess_word, bot, bot_message, db, word_pairs_keys,
                                        goal_ru_word, inline_button_next, inline_button_back, False)
@@ -122,9 +140,9 @@ def start_guess_words(bot: telebot.TeleBot, message: telebot.types.Message, user
         word_pair, _ = db.get_repeat_session_data(user_id)
         db.del_repeat_session_data(user_id)
 
+        inline_markup.add(inline_button_next, inline_button_back, InlineButtons.main_menu)
+
         message_text = (f"Вы повторили слова в кол-ве "
                         f"{len(word_pair)} 🤓")
 
-        inline_markup.add(inline_button_next, inline_button_back, InlineButtons.main_menu)
-
-        bot.send_message(message.chat.id, message_text, reply_markup=inline_markup)
+        bot.send_message(chat_id, message_text, reply_markup=inline_markup)
