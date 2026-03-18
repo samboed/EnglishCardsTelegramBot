@@ -1,5 +1,5 @@
 # EnglishCardsTelegramBot
 
-## Database Struture
+## Database Structure
 
-[](images/db_structure.png)
+![](images/db_structure.png)
