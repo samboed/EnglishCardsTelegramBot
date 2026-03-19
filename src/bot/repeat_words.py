@@ -36,6 +36,7 @@ def __get_words_to_guess_keyboard_markup(word_pair: tuple[str, str],
 
     return markup
 
+
 def __try_guess_word(message: telebot.types.Message, bot: telebot.TeleBot,
                      bot_prev_message: telebot.types.Message, db: Database,
                      word_pairs_keys: tuple[int, int, int], goal_word: str,
@@ -69,6 +70,7 @@ def __try_guess_word(message: telebot.types.Message, bot: telebot.TeleBot,
         bot.register_next_step_handler(message, __try_guess_word, bot, bot_prev_message, db, word_pairs_keys,
                                        goal_word, inline_button_next, inline_button_back, en_word, True)
 
+
 def __get_session_data_from_db(user_id, db: Database,
                                one_session_data: tuple[list[tuple[str, str]], list[tuple[int, int, int]]]) \
         -> tuple[tuple[str, str], tuple[int, int, int], list[tuple[str, str]]]:
@@ -83,6 +85,7 @@ def __get_session_data_from_db(user_id, db: Database,
         another_word_pairs = []
 
     return word_pair, word_pairs_keys, another_word_pairs
+
 
 def start_guess_words(bot: telebot.TeleBot, message: telebot.types.Message,
                       user_id: int, db: Database, inline_button_next: telebot.types.InlineKeyboardButton,

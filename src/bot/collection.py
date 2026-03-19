@@ -5,6 +5,7 @@ from src.bot.defines import CallBackData, InlineButtons
 __MAX_WORD_COLLS_PER_PAGE = 6
 __MAX_SYMBOLS_IN_ONE_MESSAGE = 4096
 
+
 def __generate_word_groups_by_rank(word_pairs_ranks: list[tuple[str, str, int]]) \
         -> tuple[list[tuple[str,str]], list[tuple[str,str]], list[tuple[str,str]]]:
     unknown_words = []
@@ -20,6 +21,7 @@ def __generate_word_groups_by_rank(word_pairs_ranks: list[tuple[str, str, int]])
                 fixed_words.append((ru_word, en_word))
 
     return unknown_words, learned_words, fixed_words
+
 
 def show_collection_sum_info(bot: telebot.TeleBot, message: telebot.types.Message,
                              word_pairs_ranks: list[tuple[str, str, int]],
@@ -39,6 +41,7 @@ def show_collection_sum_info(bot: telebot.TeleBot, message: telebot.types.Messag
 
     new_message = bot.send_message(message.chat.id, message_text, parse_mode="HTML")
     return new_message
+
 
 def show_collection_words(bot: telebot.TeleBot, message: telebot.types.Message,
                           word_pairs_ranks: list[tuple[str, str, int]],
@@ -87,6 +90,7 @@ def show_collection_words(bot: telebot.TeleBot, message: telebot.types.Message,
         len_message_text -= cur_message_len
 
     return last_message
+
 
 def selecting_collection(bot: telebot.TeleBot, call: telebot.types.CallbackQuery,
                          callback_data_prefix_coll: str, collection_data_list: list[str], num_page: int,

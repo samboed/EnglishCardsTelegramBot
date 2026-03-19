@@ -1,6 +1,8 @@
+import logging
 import psycopg2
 
 from src.db.common import get_user_id
+
 
 def get_qty_repeated_words_for_month(conn: psycopg2.extensions.connection,
                                      user_telegram_id: int) -> int | bool:
@@ -20,7 +22,7 @@ def get_qty_repeated_words_for_month(conn: psycopg2.extensions.connection,
             conn.commit()
             res_fetch = cur.fetchall()
         except psycopg2.Error as ex:
-            print(ex)
+            logging.exception(f"(user_id-{user_id}) {ex}")
             conn.rollback()
             return False
 
@@ -51,7 +53,7 @@ def get_qty_repeated_words_for_week(conn: psycopg2.extensions.connection, user_t
             conn.commit()
             res_fetch = cur.fetchall()
         except psycopg2.Error as ex:
-            print(ex)
+            logging.exception(f"(user_id-{user_id}) {ex}")
             conn.rollback()
             return False
 
@@ -82,7 +84,7 @@ def get_qty_repeated_words_for_day(conn: psycopg2.extensions.connection, user_te
             conn.commit()
             res_fetch = cur.fetchall()
         except psycopg2.Error as ex:
-            print(ex)
+            logging.exception(f"(user_id-{user_id}) {ex}")
             conn.rollback()
             return False
 
@@ -113,7 +115,7 @@ def get_qty_learn_words(conn: psycopg2.extensions.connection, user_telegram_id: 
             conn.commit()
             res_fetch = cur.fetchall()
         except psycopg2.Error as ex:
-            print(ex)
+            logging.exception(f"(user_id-{user_id}) {ex}")
             conn.rollback()
             return False
 
@@ -144,7 +146,7 @@ def get_qty_fixed_words(conn: psycopg2.extensions.connection, user_telegram_id: 
             conn.commit()
             res_fetch = cur.fetchall()
         except psycopg2.Error as ex:
-            print(ex)
+            logging.exception(f"(user_id-{user_id}) {ex}")
             conn.rollback()
             return False
 

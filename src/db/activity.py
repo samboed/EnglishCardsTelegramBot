@@ -1,3 +1,4 @@
+import logging
 import psycopg2
 
 from src.db.common import get_user_id
@@ -18,7 +19,7 @@ def add_user_activity(conn: psycopg2.extensions.connection, user_telegram_id: in
             cur.execute(query, [user_id])
             conn.commit()
         except psycopg2.Error as ex:
-            print(ex)
+            logging.exception(f"(user_id-{user_id}) {ex}")
             conn.rollback()
             return False
 
@@ -42,7 +43,7 @@ def update_user_activity(conn: psycopg2.extensions.connection, user_telegram_id:
             cur.execute(query, [user_id])
             conn.commit()
         except psycopg2.Error as ex:
-            print(ex)
+            logging.exception(f"(user_id-{user_id}) {ex}")
             conn.rollback()
             return False
 
@@ -78,12 +79,12 @@ def get_qty_nonstop_repeat_days(conn: psycopg2.extensions.connection,
             conn.commit()
             res_fetch = cur.fetchall()
         except psycopg2.Error as ex:
-            print(ex)
+            logging.exception(f"(user_id-{user_id}) {ex}")
             conn.rollback()
             return False
 
     if not res_fetch:
-        return 0, 0
+        return False
 
     current_nonstop_days, max_nonstop_days = res_fetch[0]
 

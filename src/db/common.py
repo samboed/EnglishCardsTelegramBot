@@ -1,4 +1,6 @@
+import logging
 import psycopg2
+
 
 def get_user_id(conn: psycopg2.extensions.connection, user_telegram_id: int):
     query = """
@@ -11,7 +13,7 @@ def get_user_id(conn: psycopg2.extensions.connection, user_telegram_id: int):
             cur.execute(query, [user_telegram_id])
             res_fetch = cur.fetchall()
         except psycopg2.Error as ex:
-            print(ex)
+            logging.exception(ex)
             conn.rollback()
             return False
 

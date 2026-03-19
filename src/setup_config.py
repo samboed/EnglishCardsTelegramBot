@@ -7,12 +7,14 @@ config = configparser.ConfigParser()
 config['DATABASE'] = {'username': '', 'password': ''}
 config['TELEGRAM'] = {'token': ''}
 
+
 def create_setup_config() -> str | None:
     if not os.path.exists(PATH_SETUP_CONFIG):
         with open(PATH_SETUP_CONFIG, 'w') as config_file:
             config.write(config_file)
         return PATH_SETUP_CONFIG
     return None
+
 
 def read_setup_config() -> tuple[str, str, str]:
     config = configparser.ConfigParser()

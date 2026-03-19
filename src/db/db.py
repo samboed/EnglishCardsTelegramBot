@@ -2,7 +2,7 @@ import csv
 import glob
 import os
 import sys
-
+import logging
 import psycopg2
 
 from pathlib import Path
@@ -21,6 +21,7 @@ from src.db.statistic import (get_qty_repeated_words_for_month, get_qty_repeated
 
 PATH_CREATE_TABLES_SQL_SCRIPT = os.path.join(os.path.curdir, "src", "db", "sql", "create_tables.sql")
 PATH_DEFAULT_COLLECTIONS = os.path.join(os.path.curdir, "data", "collections")
+
 
 class Database:
     __DB_NAME = "EnglishCardsBot"
@@ -45,7 +46,7 @@ class Database:
         try:
             postgres_conn = psycopg2.connect(database="postgres", user=user_name, password=user_password)
         except Exception as ex:
-            print(ex)
+            logging.exception(ex)
             return False
         postgres_conn.autocommit = True
         create_database(postgres_conn, self.__DB_NAME)
@@ -67,10 +68,10 @@ class Database:
                 self.add_collection(collection_name, None, user_id=ADMIN_USER_ID)
                 add_word_pairs(self.__conn, None, collection_name, word_pairs_list, ADMIN_USER_ID)
 
-    def add_new_user(self, user_telegram_id: int, user_id: int = None):
+    def add_new_user(self, user_telegram_id: int | None, user_id: int = None):
         return add_new_user(self.__conn, user_telegram_id,  user_id)
 
-    def add_collection(self, collection_name: str, user_telegram_id: int, user_id: int = None):
+    def add_collection(self, collection_name: str, user_telegram_id: int | None, user_id: int = None):
         return add_collection(self.__conn, collection_name, user_telegram_id, user_id)
 
     def add_common_collections_for_user(self, user_telegram_id: int) -> bool:

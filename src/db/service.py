@@ -1,6 +1,8 @@
+import logging
 import psycopg2
 
 from psycopg2 import sql
+
 
 def create_database(conn: psycopg2.extensions.connection, db_name: str) -> bool:
     query = sql.SQL("CREATE DATABASE {}").format(sql.Identifier(db_name))
@@ -21,8 +23,8 @@ def create_tables(conn: psycopg2.extensions.connection, path_sql_script: str) ->
         try:
             cur.execute(queries)
             conn.commit()
-        except psycopg2.Error as EX:
-            print(EX)
+        except psycopg2.Error as ex:
+            logging.exception(ex)
             conn.rollback()
             return False
 

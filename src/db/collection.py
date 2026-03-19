@@ -1,10 +1,12 @@
+import logging
 import psycopg2
 
 from src.db.users import ADMIN_USER_ID
 from src.db.common import get_user_id
 
+
 def add_collection(conn: psycopg2.extensions.connection, collection_name: str,
-                   user_telegram_id: int, user_id: int = None) -> bool:
+                   user_telegram_id: int | None, user_id: int = None) -> bool:
     query = """
     INSERT INTO Collections (name, owner_id) 
      VALUES (%s, %s);
@@ -25,6 +27,7 @@ def add_collection(conn: psycopg2.extensions.connection, collection_name: str,
 
     return True
 
+
 def add_common_collections_for_user(conn: psycopg2.extensions.connection,
                                     user_telegram_id: int) -> bool:
     query = f"""
@@ -44,11 +47,12 @@ def add_common_collections_for_user(conn: psycopg2.extensions.connection,
             cur.execute(query, [user_id])
             conn.commit()
         except psycopg2.Error as ex:
-            print(ex)
+            logging.exception(f"(user_id-{user_id}) {ex}")
             conn.rollback()
             return False
 
     return True
+
 
 def add_collection_for_user(conn: psycopg2.extensions.connection,
                             user_telegram_id: int, collection_name: str) -> bool:
@@ -69,11 +73,12 @@ def add_collection_for_user(conn: psycopg2.extensions.connection,
             cur.execute(query, [user_id, collection_name])
             conn.commit()
         except psycopg2.Error as ex:
-            print(ex)
+            logging.exception(f"(user_id-{user_id}) {ex}")
             conn.rollback()
             return False
 
     return True
+
 
 def del_user_collection(conn: psycopg2.extensions.connection,
                         user_telegram_id: int, collection_name: str) -> bool:
@@ -91,11 +96,12 @@ def del_user_collection(conn: psycopg2.extensions.connection,
             cur.execute(query, [collection_name, user_id])
             conn.commit()
         except psycopg2.Error as ex:
-            print(ex)
+            logging.exception(f"(user_id-{user_id}) {ex}")
             conn.rollback()
             return False
 
     return True
+
 
 def get_available_collections(conn: psycopg2.extensions.connection, user_telegram_id: int) -> list[str] | bool:
     query = """
@@ -118,7 +124,7 @@ def get_available_collections(conn: psycopg2.extensions.connection, user_telegra
             conn.commit()
             res_fetch = cur.fetchall()
         except psycopg2.Error as ex:
-            print(ex)
+            logging.exception(f"(user_id-{user_id}) {ex}")
             conn.rollback()
             return False
 
@@ -127,6 +133,7 @@ def get_available_collections(conn: psycopg2.extensions.connection, user_telegra
         collection_info_list = [row[0] for row in res_fetch]
 
     return collection_info_list
+
 
 def get_collection_owner_id(conn: psycopg2.extensions.connection, collection_name: str,
                             user_telegram_id: int) -> int | bool:
@@ -149,13 +156,14 @@ def get_collection_owner_id(conn: psycopg2.extensions.connection, collection_nam
             conn.commit()
             res_fetch = cur.fetchall()
         except psycopg2.Error as ex:
-            print(ex)
+            logging.exception(f"(user_id-{user_id}) {ex}")
             conn.rollback()
             return False
 
     owner_id = res_fetch[0][0]
 
     return owner_id
+
 
 def get_collection_words(conn: psycopg2.extensions.connection, collection_name: str,
                          user_telegram_id: int, zero_level_mastery: bool = None,
@@ -197,6 +205,9 @@ def get_collection_words(conn: psycopg2.extensions.connection, collection_name: 
         return False, None
 
     owner_id = get_collection_owner_id(conn, collection_name, user_telegram_id)
+    if not owner_id:
+        return False, None
+
     protected_collection = owner_id == ADMIN_USER_ID
 
     variables = [user_id, collection_name]
@@ -214,7 +225,7 @@ def get_collection_words(conn: psycopg2.extensions.connection, collection_name: 
             conn.commit()
             res_fetch = cur.fetchall()
         except psycopg2.Error as ex:
-            print(ex)
+            logging.exception(f"(user_id-{user_id}) {ex}")
             conn.rollback()
             return False, protected_collection
 
@@ -227,6 +238,7 @@ def get_collection_words(conn: psycopg2.extensions.connection, collection_name: 
     word_pairs_ranks = [(ru_word, en_word, rank) for _, ru_word, en_word, _, _, _, rank in res_fetch]
 
     return word_pairs, word_pairs_keys, word_pairs_ranks, protected_collection
+
 
 def add_words(conn: psycopg2.extensions.connection, user_telegram_id: int,
               collection_name: str, ru_word: str, en_word: str) -> bool:
@@ -270,14 +282,18 @@ def add_words(conn: psycopg2.extensions.connection, user_telegram_id: int,
             collection_id, ru_word_id, en_word_id = eval(cur.fetchall()[0][0])
             cur.execute(query_init_words_progress, [user_id, collection_id, ru_word_id, en_word_id])
             conn.commit()
+        except psycopg2.errors.UniqueViolation:
+            conn.rollback()
+            return False
         except psycopg2.Error as ex:
-            print(ex)
+            logging.exception(f"(user_id-{user_id}) {ex}")
             conn.rollback()
             return False
 
     return True
 
-def add_word_pairs(conn: psycopg2.extensions.connection, user_telegram_id: int, collection_name: str,
+
+def add_word_pairs(conn: psycopg2.extensions.connection, user_telegram_id: int | None, collection_name: str,
                    word_pairs_list: list[tuple[str, str]], user_id: int = None) -> bool:
     query_insert_ru_word = """
     INSERT INTO RuWords (word) 
@@ -324,11 +340,12 @@ def add_word_pairs(conn: psycopg2.extensions.connection, user_telegram_id: int, 
                     cur.execute(query_init_words_progress, [user_id, collection_id, ru_word_id, en_word_id])
             conn.commit()
         except psycopg2.Error as ex:
-            print(ex)
+            logging.exception(f"(user_id-{user_id}) {ex}")
             conn.rollback()
             return False
 
     return True
+
 
 def del_words(conn: psycopg2.extensions.connection, user_telegram_id: int,
               collection_name: str, ru_word: str, en_word: str) -> bool:
@@ -352,7 +369,7 @@ def del_words(conn: psycopg2.extensions.connection, user_telegram_id: int,
             cur.execute(query, [user_id, collection_name, ru_word, en_word])
             conn.commit()
         except psycopg2.Error as ex:
-            print(ex)
+            logging.exception(f"(user_id-{user_id}) {ex}")
             conn.rollback()
             return False
 

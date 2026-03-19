@@ -1,6 +1,8 @@
+import logging
 import psycopg2
 
 ADMIN_USER_ID = 9223372036854775807
+
 
 def add_new_user(conn: psycopg2.extensions.connection, user_telegram_id: int,
                  user_id: int = None) -> bool:
@@ -26,7 +28,7 @@ def add_new_user(conn: psycopg2.extensions.connection, user_telegram_id: int,
             cur.execute(query, variables)
             conn.commit()
         except psycopg2.Error as ex:
-            print(ex)
+            logging.exception(f"(user_id-{user_id}) {ex}")
             conn.rollback()
             return False
 

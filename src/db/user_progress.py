@@ -1,6 +1,8 @@
+import logging
 import psycopg2
 
 from src.db.common import get_user_id
+
 
 def upgrade_user_progress(conn: psycopg2.extensions.connection, user_telegram_id : int,
                           word_pairs_keys : tuple[int, int, int]) -> bool:
@@ -31,7 +33,7 @@ def upgrade_user_progress(conn: psycopg2.extensions.connection, user_telegram_id
             cur.execute(query, variables)
             conn.commit()
         except psycopg2.Error as ex:
-            print(ex)
+            logging.exception(f"(user_id-{user_id}) {ex}")
             conn.rollback()
             return False
 

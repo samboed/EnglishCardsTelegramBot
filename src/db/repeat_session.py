@@ -1,6 +1,8 @@
+import logging
 import psycopg2
 
 from src.db.common import get_user_id
+
 
 def add_repeat_session_words(conn: psycopg2.extensions.connection, user_telegram_id: int,
                              word_pairs_keys: list[tuple[int, int, int]]) -> bool:
@@ -21,11 +23,12 @@ def add_repeat_session_words(conn: psycopg2.extensions.connection, user_telegram
             cur.executemany(query, insert_data)
             conn.commit()
         except psycopg2.Error as ex:
-            print(ex)
+            logging.exception(f"(user_id-{user_id}) {ex}")
             conn.rollback()
             return False
 
     return True
+
 
 def del_repeat_session_data(conn: psycopg2.extensions.connection, user_telegram_id: int,
                             word_pairs_keys: list[tuple[int, int, int]] = None) -> bool:
@@ -48,11 +51,12 @@ def del_repeat_session_data(conn: psycopg2.extensions.connection, user_telegram_
             cur.execute(query, variables)
             conn.commit()
         except psycopg2.Error as ex:
-            print(ex)
+            logging.exception(f"(user_id-{user_id}) {ex}")
             conn.rollback()
             return False
 
     return True
+
 
 def get_repeat_session_data(conn: psycopg2.extensions.connection, user_telegram_id: int,
                             word_pairs_exception: tuple[int, int, int] = None,
@@ -101,7 +105,7 @@ def get_repeat_session_data(conn: psycopg2.extensions.connection, user_telegram_
             conn.commit()
             res_fetch = cur.fetchall()
         except psycopg2.Error as ex:
-            print(ex)
+            logging.exception(f"(user_id-{user_id}) {ex}")
             conn.rollback()
             return False
 
@@ -113,6 +117,7 @@ def get_repeat_session_data(conn: psycopg2.extensions.connection, user_telegram_
                        for _, _, collection_id, ru_word_id, en_word_id in res_fetch]
 
     return word_pairs, word_pairs_keys
+
 
 def update_repeat_session_data(conn: psycopg2.extensions.connection, user_telegram_id: int,
                                word_pairs_keys: tuple[int, int, int], ru_word_repeated: bool = None,
@@ -150,7 +155,7 @@ def update_repeat_session_data(conn: psycopg2.extensions.connection, user_telegr
             cur.execute(query, variables)
             conn.commit()
         except psycopg2.Error as ex:
-            print(ex)
+            logging.exception(f"(user_id-{user_id}) {ex}")
             conn.rollback()
             return False
 

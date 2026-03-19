@@ -1,12 +1,13 @@
 import sys
 import telebot
-import telebot.types
+import logging
 
 from src.db.db import Database
 from src.bot.defines import Commands, CallBackData, InlineButtons, WELCOME_TEXT
 from src.bot.service import clear_last_message
 from src.bot.repeat_words import start_guess_words
 from src.bot.collection import show_collection_sum_info, selecting_collection, show_collection_words
+
 
 class Bot:
     def __init__(self, token: str, db: Database):
@@ -15,7 +16,7 @@ class Bot:
         try:
             self.__bot = telebot.TeleBot(token)
         except Exception as ex:
-            print(ex)
+            logging.exception(ex)
             sys.exit(1)
 
         self.__bot.register_message_handler(self.__start, commands=[Commands.START])
@@ -189,6 +190,8 @@ class Bot:
 
         else:
             collection_data_list = self.__db.get_available_collections(user_id)
+            if not collection_data_list:
+                collection_data_list = []
 
             if call.data == CallBackData.STUDY:
                 clear_last_message(self.__bot, call.message)
@@ -231,7 +234,10 @@ class Bot:
 
                 self.__bot.send_message(chat_id, "Нет слов для повтора 0️⃣", reply_markup=markup)
         else:
-            collection_data_list = self.__db.get_available_collections(chat_id)
+            collection_data_list = self.__db.get_available_collections(user_id)
+            if not collection_data_list:
+                collection_data_list = []
+
             if call.data == CallBackData.REPEAT:
                 clear_last_message(self.__bot, call.message)
                 self.__db.del_repeat_session_data(user_id)
@@ -349,8 +355,9 @@ class Bot:
                                                           f'"{coll_name.capitalize()}" 📔❌\n'
                                                           f'Коллекция уже существует 📝')
 
-
                 collection_data_list = self.__db.get_available_collections(user_id)
+                if not collection_data_list:
+                    collection_data_list = []
 
                 selecting_collection(self.__bot, call, CallBackData.DICT, collection_data_list,
                                      1, True, True)
@@ -385,6 +392,8 @@ class Bot:
                                                           f'"{coll_name.capitalize()}" 📔❌')
 
                 collection_data_list = self.__db.get_available_collections(user_id)
+                if not collection_data_list:
+                    collection_data_list = []
 
                 selecting_collection(self.__bot, call, CallBackData.DICT, collection_data_list,
                                      1, True, True)
@@ -430,10 +439,12 @@ class Bot:
                     markup.add(inline_button_add_word, inline_button_del_word,
                                inline_button_back, InlineButtons.main_menu)
 
-                    self.__bot.send_message(chat_id, f'Не получилось добавить слова '
-                                                          f'"{ru_word}" 🇷🇺 и "{en_word}" 🇬🇧 '
-                                                          f'в коллекцию "{coll_name}" 📚❌\n'
-                                                          f'Слова уже существуют в коллекции 📝')
+                    message_text = (f'Не получилось добавить слова '
+                                    f'"{ru_word}" 🇷🇺 и "{en_word}" 🇬🇧 '
+                                    f'в коллекцию "{coll_name}" 📚❌\n'
+                                    f'Слова уже существуют в коллекции 📝')
+
+                    self.__bot.send_message(chat_id, message_text, reply_markup=markup)
 
             def reg_ru_word(message: telebot.types.Message, bot_message: telebot.types.Message,
                             coll_name: str, inline_button_cancel: telebot.types.InlineKeyboardButton):
@@ -496,10 +507,11 @@ class Bot:
                     markup.add(inline_button_add_word, inline_button_del_word,
                                inline_button_back, InlineButtons.main_menu)
 
-                    self.__bot.send_message(chat_id, f'Не получилось удалить '
-                                                          f'слова "{ru_word}" 🇷🇺 и "{en_word}" 🇬🇧 '
-                                                          f'из коллекции "{coll_name}" 📚❌',
-                                            reply_markup=markup)
+                    message_text = (f'Не получилось удалить '
+                                    f'слова "{ru_word}" 🇷🇺 и "{en_word}" 🇬🇧 '
+                                    f'из коллекции "{coll_name}" 📚❌')
+
+                    self.__bot.send_message(chat_id, message_text, reply_markup=markup)
 
             def reg_ru_word(message: telebot.types.Message, bot_message: telebot.types.Message, coll_name: str,
                             inline_button_cancel: telebot.types.InlineKeyboardButton):
@@ -535,6 +547,9 @@ class Bot:
                                                   inline_button_cancel)
         else:
             collection_data_list = self.__db.get_available_collections(user_id)
+            if not collection_data_list:
+                collection_data_list = []
+
             if call.data == CallBackData.DICT:
                 clear_last_message(self.__bot, call.message)
                 selecting_collection(self.__bot, call, CallBackData.DICT, collection_data_list,
@@ -550,12 +565,38 @@ class Bot:
         user_id = call.from_user.id
         chat_id = call.message.chat.id
 
-        qty_nonstop_days, max_nonstop_days = self.__db.get_qty_nonstop_repeat_days(user_id)
-        qty_learn_words = self.__db.get_qty_learn_words(user_id)
-        qty_fixed_words = self.__db.get_qty_fixed_words(user_id)
-        qty_repeat_words_for_today = self.__db.get_qty_repeated_words_for_day(user_id)
-        qty_repeat_words_for_week = self.__db.get_qty_repeated_words_for_week(user_id)
-        qty_repeated_words_for_month = self.__db.get_qty_repeated_words_for_month(user_id)
+        res_get_qty_nonstop_repeat_days = self.__db.get_qty_nonstop_repeat_days(user_id)
+        res_get_qty_learn_words = self.__db.get_qty_learn_words(user_id)
+        res_get_qty_fixed_words = self.__db.get_qty_fixed_words(user_id)
+        res_get_qty_repeat_words_for_today = self.__db.get_qty_repeated_words_for_day(user_id)
+        res_get_qty_repeat_words_for_week = self.__db.get_qty_repeated_words_for_week(user_id)
+        res_get_qty_repeat_words_for_month = self.__db.get_qty_repeated_words_for_month(user_id)
+
+        if res_get_qty_nonstop_repeat_days is False:
+            qty_nonstop_days = '-'
+            max_nonstop_days = '-'
+        else:
+            qty_nonstop_days, max_nonstop_days = res_get_qty_nonstop_repeat_days
+        if res_get_qty_learn_words is False:
+            qty_learn_words = '-'
+        else:
+            qty_learn_words = res_get_qty_learn_words
+        if res_get_qty_fixed_words is False:
+            qty_fixed_words = '-'
+        else:
+            qty_fixed_words = res_get_qty_fixed_words
+        if res_get_qty_repeat_words_for_today is False:
+            qty_repeat_words_for_today = '-'
+        else:
+            qty_repeat_words_for_today = res_get_qty_repeat_words_for_today
+        if res_get_qty_repeat_words_for_week is False:
+            qty_repeat_words_for_week = '-'
+        else:
+            qty_repeat_words_for_week = res_get_qty_repeat_words_for_week
+        if res_get_qty_repeat_words_for_month is False:
+            qty_repeated_words_for_month = '-'
+        else:
+            qty_repeated_words_for_month = res_get_qty_repeat_words_for_month
 
         message_text = (f"Вы учите слова <b>{qty_nonstop_days}</b> дней подряд 🗓️\n"
                         f"Рекорд - <b>{max_nonstop_days}</b> дней 🏆\n"
