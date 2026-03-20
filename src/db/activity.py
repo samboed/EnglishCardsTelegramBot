@@ -1,7 +1,7 @@
 import logging
 import psycopg2
 
-from src.db.common import get_user_id
+from src.db.users import get_user_id
 
 def add_user_activity(conn: psycopg2.extensions.connection, user_telegram_id: int) -> bool:
     query = f"""

@@ -1,7 +1,7 @@
 import logging
 import psycopg2
 
-from src.db.common import get_user_id
+from src.db.users import get_user_id
 
 
 def get_qty_repeated_words_for_month(conn: psycopg2.extensions.connection,
