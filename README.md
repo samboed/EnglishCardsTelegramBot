@@ -16,7 +16,7 @@ using the PyTelegramBotAPI, psycopg2
 
 ## Project Structure
 
-`
+```
 EnglishCardsTelegramBot /
 ├── data/
 │   └── collections/ # directory for basic sets of words
@@ -45,22 +45,22 @@ EnglishCardsTelegramBot /
 │       └── users.py - interaction with Users table
 ├── requirements.txt - project requirements
 └── README.md
-`
+```
 
 ## Database Structure
 
 ![](images/db_structure.png)
 
-Tables List:
-* Users - telegram uid list for each user
-* UserActivity - registration of user activities
-* UserProgress - user progress in learned words
-* UserRepeatSession - table for temporarily storing words during a user's learning session
-* Collections - collection info
-* CollectionsUsers - available collections for user
-* CollectionsWords - listing the russian and english word IDs for each collection
-* RuWords - list of russian words
-* EnWords - list of english words
+### Tables List:
+* *Users* - telegram uid list for each user
+* *UserActivity* - registration of user activities
+* *UserProgress* - user progress in learned words
+* *UserRepeatSession* - table for temporarily storing words during a user's learning session
+* *Collections* - collection info
+* *CollectionsUsers* - available collections for user
+* *CollectionsWords* - listing the russian and english word IDs for each collection
+* *RuWords* - list of russian words
+* *EnWords* - list of english words
 
 ## Setup and Installation
 
