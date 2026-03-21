@@ -1,9 +1,10 @@
 import logging
 import psycopg2
 
-from src.db.users import get_user_id
+from src.db.connection import connect_db
 
 
+@connect_db
 def upgrade_user_progress(conn: psycopg2.extensions.connection, user_telegram_id : int,
                           word_pairs_keys : tuple[int, int, int]) -> bool:
     query = f"""
@@ -22,18 +23,14 @@ def upgrade_user_progress(conn: psycopg2.extensions.connection, user_telegram_id
           AND (up.lvl_mastery = 0 OR urs.was_mistake = FALSE);
     """
 
-    user_id = get_user_id(conn, user_telegram_id)
-    if not user_id:
-        return False
-
-    variables = [user_id, *word_pairs_keys] * 2
+    variables = [user_telegram_id, *word_pairs_keys] * 2
 
     with conn.cursor() as cur:
         try:
             cur.execute(query, variables)
             conn.commit()
         except psycopg2.Error as ex:
-            logging.exception(f"(user_id-{user_id}) {ex}")
+            logging.exception(f"(user_telegram_id-{user_telegram_id}) {ex}")
             conn.rollback()
             return False
 

@@ -1,6 +1,5 @@
 CREATE TABLE IF NOT EXISTS Users (
-    user_id SERIAL8 PRIMARY KEY,
-    telegram_uid INT8 UNIQUE
+    user_id INT8 PRIMARY KEY
 );
 
 CREATE TABLE IF NOT EXISTS UsersActivity (

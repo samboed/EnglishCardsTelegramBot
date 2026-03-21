@@ -1,8 +1,10 @@
 import logging
 import psycopg2
 
-from src.db.users import get_user_id
+from src.db.connection import connect_db
 
+
+@connect_db
 def add_user_activity(conn: psycopg2.extensions.connection, user_telegram_id: int) -> bool:
     query = f"""
     INSERT INTO UsersActivity (user_id, study_date)
@@ -10,21 +12,19 @@ def add_user_activity(conn: psycopg2.extensions.connection, user_telegram_id: in
     ON CONFLICT ON CONSTRAINT UNIQUE_DateByUser DO NOTHING; 
     """
 
-    user_id = get_user_id(conn, user_telegram_id)
-    if not user_id:
-        return False
-
     with conn.cursor() as cur:
         try:
-            cur.execute(query, [user_id])
+            cur.execute(query, [user_telegram_id])
             conn.commit()
         except psycopg2.Error as ex:
-            logging.exception(f"(user_id-{user_id}) {ex}")
+            logging.exception(f"(user_telegram_id-{user_telegram_id}) {ex}")
             conn.rollback()
             return False
 
     return True
 
+
+@connect_db
 def update_user_activity(conn: psycopg2.extensions.connection, user_telegram_id: int) -> bool:
     query = f"""
     UPDATE UsersActivity
@@ -32,23 +32,21 @@ def update_user_activity(conn: psycopg2.extensions.connection, user_telegram_id:
     WHERE user_id = %s
     """
 
-    add_user_activity(conn, user_telegram_id)
-
-    user_id = get_user_id(conn, user_telegram_id)
-    if not user_id:
-        return False
+    add_user_activity(user_telegram_id)
 
     with conn.cursor() as cur:
         try:
-            cur.execute(query, [user_id])
+            cur.execute(query, [user_telegram_id])
             conn.commit()
         except psycopg2.Error as ex:
-            logging.exception(f"(user_id-{user_id}) {ex}")
+            logging.exception(f"(user_telegram_id-{user_telegram_id}) {ex}")
             conn.rollback()
             return False
 
     return True
 
+
+@connect_db
 def get_qty_nonstop_repeat_days(conn: psycopg2.extensions.connection,
                                 user_telegram_id: int) -> bool | tuple[int, int]:
     query = f"""
@@ -69,22 +67,18 @@ def get_qty_nonstop_repeat_days(conn: psycopg2.extensions.connection,
     LIMIT 1
     """
 
-    user_id = get_user_id(conn, user_telegram_id)
-    if not user_id:
-        return False
-
     with conn.cursor() as cur:
         try:
-            cur.execute(query, [user_id])
+            cur.execute(query, [user_telegram_id])
             conn.commit()
             res_fetch = cur.fetchall()
         except psycopg2.Error as ex:
-            logging.exception(f"(user_id-{user_id}) {ex}")
+            logging.exception(f"(user_telegram_id-{user_telegram_id}) {ex}")
             conn.rollback()
             return False
 
     if not res_fetch:
-        return False
+        return 0, 0
 
     current_nonstop_days, max_nonstop_days = res_fetch[0]
 
