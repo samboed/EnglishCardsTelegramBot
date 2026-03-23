@@ -33,7 +33,7 @@ def show_collection_sum_info(bot: telebot.TeleBot, message: telebot.types.Messag
     qty_fixed_words = len(fixed_words)
     total_words = len(word_pairs_ranks)
 
-    message_text = (f"Коллекция <b>«{collection_name.capitalize()}»</b> 📔\n"
+    message_text = (f"Сборник <b>«{collection_name.capitalize()}»</b> 📔\n"
                     f"- Доступно для изучения: {qty_unknown_words}\n"
                     f"- Изученные: {qty_learned_words}\n"
                     f"- Освоенные: {qty_fixed_words}\n"
@@ -69,7 +69,7 @@ def show_collection_words(bot: telebot.TeleBot, message: telebot.types.Message,
         fixed_words_text = "\t\t~"
 
     space = "\u2800"
-    message_text = (f"Список слов коллекции <b>«{collection_name.capitalize()}»</b>:\n"
+    message_text = (f"Список слов сборника <b>«{collection_name.capitalize()}»</b>:\n"
                     f"- Доступно для изучения:\n"
                     f"{unknown_words_text}\n"
                     f"- Изученные:\n"
@@ -129,7 +129,7 @@ def selecting_collection(bot: telebot.TeleBot, call: telebot.types.CallbackQuery
     markup.add(InlineButtons.main_menu)
 
     if show_menu:
-        bot.send_message(call.message.chat.id, "Выберите коллекцию 📗📘📙",
+        bot.send_message(call.message.chat.id, "Выберите сборник слов 📗📘📙",
                                 reply_markup=markup)
     else:
         try:

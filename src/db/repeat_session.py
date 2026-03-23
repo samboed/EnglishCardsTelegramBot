@@ -60,15 +60,15 @@ def get_repeat_session_data(conn: psycopg2.extensions.connection, user_telegram_
     query = """
     SELECT rw.word, ew.word, urs.collection_id, urs.ru_word_id, urs.en_word_id
      FROM (SELECT * 
-            FROM usersrepeatsession
+            FROM UsersRepeatSession
            WHERE user_id = %s) AS urs
-    JOIN collectionswords AS cw
+    JOIN CollectionsWords AS cw
      ON urs.collection_id = cw.collection_id 
       AND urs.ru_word_id  = cw.ru_word_id
-      AND urs.en_word_id = cw.en_word_id 
-    JOIN ruwords AS rw
+      AND urs.en_word_id = cw.en_word_id
+    JOIN RuWords AS rw
      ON cw.ru_word_id = rw.word_id
-    JOIN enwords AS ew
+    JOIN EnWords AS ew
      ON cw.en_word_id = ew.word_id
     """
 
@@ -116,7 +116,7 @@ def update_repeat_session_data(conn: psycopg2.extensions.connection, user_telegr
     query = """
     UPDATE UsersRepeatSession
      SET {0}
-    WHERE user_id = %s AND (collection_id, ru_word_id, en_word_id) IN ((%s, %s, %s)); 
+    WHERE (user_id, collection_id, ru_word_id, en_word_id) IN ((%s, %s, %s, %s)); 
     """
 
     variables = []

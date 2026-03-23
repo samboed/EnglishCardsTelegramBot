@@ -154,22 +154,23 @@ def get_collection_words(conn: psycopg2.extensions.connection, collection_name: 
                                                 tuple[list[tuple[str, str]], list[tuple[int, int, int]],
                                                 list[tuple[str, str, int]], bool]):
     query = """
-    SELECT cu.owner_id, rw.word, ew.word, cw.collection_id, cw.ru_word_id, cw.en_word_id, up.lvl_mastery 
-     FROM (SELECT c.collection_id, c.owner_id
+    SELECT rw.word, ew.word, cw.collection_id, cw.ru_word_id, cw.en_word_id, up.lvl_mastery 
+     FROM (SELECT cu.user_id, c.collection_id
             FROM CollectionsUsers AS cu
            JOIN Collections AS c
             ON cu.collection_id = c.collection_id 
            WHERE cu.user_id = %s AND c.name = %s) AS cu
     JOIN CollectionsWords AS cw
      ON cu.collection_id = cw.collection_id
-    JOIN ruwords AS rw
+    JOIN RuWords AS rw
      ON cw.ru_word_id = rw.word_id 
-    JOIN enwords AS ew
+    JOIN EnWords AS ew
      ON cw.en_word_id = ew.word_id 
-    LEFT JOIN usersprogress AS up
+    LEFT JOIN UsersProgress AS up
      ON cw.collection_id = up.collection_id
       AND cw.ru_word_id = up.ru_word_id 
       AND cw.en_word_id = up.en_word_id
+      AND cu.user_id = up.user_id
     """
 
     if zero_level_mastery is not None:
@@ -211,10 +212,10 @@ def get_collection_words(conn: psycopg2.extensions.connection, collection_name: 
     if not res_fetch:
         return False, protected_collection
 
-    word_pairs = [(ru_word, en_word) for _, ru_word, en_word, _, _, _, _ in res_fetch]
+    word_pairs = [(ru_word, en_word) for ru_word, en_word, _, _, _, _ in res_fetch]
     word_pairs_keys = [(collection_id, ru_word_id, en_word_id)
-                       for _, _, _, collection_id, ru_word_id, en_word_id, _ in res_fetch]
-    word_pairs_ranks = [(ru_word, en_word, rank) for _, ru_word, en_word, _, _, _, rank in res_fetch]
+                       for _, _, collection_id, ru_word_id, en_word_id, _ in res_fetch]
+    word_pairs_ranks = [(ru_word, en_word, rank) for ru_word, en_word, _, _, _, rank in res_fetch]
 
     return word_pairs, word_pairs_keys, word_pairs_ranks, protected_collection
 

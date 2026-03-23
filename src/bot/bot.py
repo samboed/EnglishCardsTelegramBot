@@ -63,7 +63,7 @@ class Bot:
         markup = telebot.types.InlineKeyboardMarkup()
         markup.add(inline_button_start)
 
-        message_text = WELCOME_TEXT.format(message.chat.username, self.__bot.get_my_name().name)
+        message_text = WELCOME_TEXT.format(message.chat.first_name, self.__bot.get_my_name().name)
 
         self.__bot.send_message(chat_id, message_text, reply_markup=markup)
 
@@ -357,12 +357,12 @@ class Bot:
                     res_add = add_collection_for_user(user_id, coll_name)
 
                 if res_add:
-                    self.__bot.send_message(chat_id, f'Коллекция "{coll_name.capitalize()}" '
-                                                     f'была добавлена 📔➕')
+                    self.__bot.send_message(chat_id, f'Сборник слов "{coll_name.capitalize()}" '
+                                                     f'был добавле 📔➕')
                 else:
-                    self.__bot.send_message(chat_id, f'Не получилось добавить коллекцию '
+                    self.__bot.send_message(chat_id, f'Не получилось добавить сборник слов '
                                                           f'"{coll_name.capitalize()}" 📔❌\n'
-                                                          f'Коллекция уже существует 📝')
+                                                          f'Сборник слов уже существует 📝')
 
                 collection_data_list = get_available_collections(user_id)
                 if not collection_data_list:
@@ -379,7 +379,7 @@ class Bot:
             markup = telebot.types.InlineKeyboardMarkup(row_width=1)
             markup.add(inline_button_cancel, InlineButtons.main_menu)
 
-            bot_message = self.__bot.send_message(chat_id,"[➕] Напишите наименование коллекции 📔",
+            bot_message = self.__bot.send_message(chat_id,"[➕] Напишите наименование сборника слов 📔",
                                                   reply_markup=markup)
 
             self.__bot.register_next_step_handler(call.message, reg_coll_then_add_from_db, bot_message)
@@ -394,10 +394,10 @@ class Bot:
                 res_del = del_collection(user_id, coll_name)
 
                 if res_del:
-                    self.__bot.send_message(chat_id, f'Коллекция "{coll_name.capitalize()}" '
-                                                          f'была удалена 📔➖')
+                    self.__bot.send_message(chat_id, f'Сборник слов "{coll_name.capitalize()}" '
+                                                          f'был удален 📔➖')
                 else:
-                    self.__bot.send_message(chat_id, f'Не получилось удалить коллекцию '
+                    self.__bot.send_message(chat_id, f'Не получилось удалить сборник слов '
                                                           f'"{coll_name.capitalize()}" 📔❌')
 
                 collection_data_list = get_available_collections(user_id)
@@ -415,7 +415,7 @@ class Bot:
             markup = telebot.types.InlineKeyboardMarkup(row_width=1)
             markup.add(inline_button_cancel, InlineButtons.main_menu)
 
-            bot_message = self.__bot.send_message(chat_id,"[➖] Напишите наименование коллекции 📔",
+            bot_message = self.__bot.send_message(chat_id,"[➖] Напишите наименование сборник слова 📔",
                                                   reply_markup=markup)
 
             self.__bot.register_next_step_handler(call.message, reg_coll_then_del_from_db, bot_message)
@@ -433,7 +433,7 @@ class Bot:
 
                 if res_add:
                     message_text = (f'Слова "{ru_word}" 🇷🇺 и "{en_word}" 🇬🇧 '
-                                    f'были добавлены в коллекцию "{coll_name.capitalize()}" 📚➕')
+                                    f'были добавлены в сборник слов "{coll_name.capitalize()}" 📚➕')
 
                     self.__bot.send_message(chat_id, message_text)
                     show_coll_sum_info_with_buttons(message, user_id, coll_name)
@@ -451,8 +451,8 @@ class Bot:
 
                     message_text = (f'Не получилось добавить слова '
                                     f'"{ru_word}" 🇷🇺 и "{en_word}" 🇬🇧 '
-                                    f'в коллекцию "{coll_name}" 📚❌\n'
-                                    f'Слова уже существуют в коллекции 📝')
+                                    f'в сборник слов "{coll_name}" 📚❌\n'
+                                    f'Слова уже существуют в сборнике слов 📝')
 
                     self.__bot.send_message(chat_id, message_text, reply_markup=markup)
 
@@ -504,7 +504,7 @@ class Bot:
 
                 if res_del:
                     message_text = (f'Слова "{ru_word}" 🇷🇺 и "{en_word}" 🇬🇧 '
-                                    f'были удалены из коллекции "{coll_name.capitalize()}" 📚➖')
+                                    f'были удалены из сборник слов "{coll_name.capitalize()}" 📚➖')
 
                     self.__bot.send_message(chat_id, message_text)
                     show_coll_sum_info_with_buttons(message, user_id, coll_name)
@@ -522,7 +522,7 @@ class Bot:
 
                     message_text = (f'Не получилось удалить '
                                     f'слова "{ru_word}" 🇷🇺 и "{en_word}" 🇬🇧 '
-                                    f'из коллекции "{coll_name}" 📚❌')
+                                    f'из сборника слов "{coll_name}" 📚❌')
 
                     self.__bot.send_message(chat_id, message_text, reply_markup=markup)
 

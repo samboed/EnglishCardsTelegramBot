@@ -19,8 +19,8 @@ def create_setup_config() -> str | None:
     if not os.path.exists(PATH_SETUP_CONFIG):
         with open(PATH_SETUP_CONFIG, 'w') as config_file:
             config.write(config_file)
-        return PATH_SETUP_CONFIG
-    return None
+        print(f"Setup config was created {PATH_SETUP_CONFIG}. Fill settings and run the program again")
+        sys.exit(0)
 
 
 def read_setup_config():
@@ -34,10 +34,23 @@ def read_setup_config():
     DB_USER_PASSWORD =  config['DATABASE']['password']
     TELEGRAM_BOT_TOKEN = config['TELEGRAM']['token']
 
+    res = True
+    if not DB_NAME:
+        print(f"You must specify database 'name' in {PATH_SETUP_CONFIG}")
+        res = False
+    if not DB_USER_NAME:
+        print(f"You must specify database 'username' in {PATH_SETUP_CONFIG}")
+        res = False
+    if not DB_USER_PASSWORD:
+        print(f"You must specify database user 'password' in {PATH_SETUP_CONFIG}")
+        res = False
+    if not TELEGRAM_BOT_TOKEN:
+        print(f"You must specify telegram 'token' in {PATH_SETUP_CONFIG}")
+        res = False
 
-res_create_config = create_setup_config()
-if res_create_config:
-    print(f"Setup config was created {res_create_config}. Fill settings and run the program again")
-    sys.exit(0)
+    if not res:
+        sys.exit(0)
 
+
+create_setup_config()
 read_setup_config()

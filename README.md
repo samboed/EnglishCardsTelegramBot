@@ -2,12 +2,22 @@
 
 Telegram bot for learning English words using spaced repetition.
 
+## Table of contents
+  * [Overview](#Overview)
+  * [Project Structure](#Project Structure)
+  * [Database Structure](#Database Structure)
+  * [Setup and Installation](#Setup and Installation)
+    * [PostgreSQL](#PostgreSQL)
+    * [Python](#Python)
+    * [TelegramBot](#TelegramBot)
+  * [Demonstration of the program](#Demonstration of the program)
+
 ## Overview
 
 The project is implemented in Python 
 using the PyTelegramBotAPI, psycopg2
 
-### Key features:
+### Key Features:
 1. Create separate collections for easier word learning
 2. Easily interact with collections through the dictionary: add, delete, viewing words
 3. Pre-made word set of the most common foreign words
@@ -35,7 +45,7 @@ EnglishCardsTelegramBot /
 │       ├── sql/
 │       │   └── create_tables.sql - creation database sctructure logic
 │       ├── init.py - database initialization
-│       ├── connection.py - connection decorator to database
+│       ├── connection.py - database connection decorator
 │       ├── activity.py - interaction with UserActivity table
 │       ├── collection.py - interaction with collections and words
 │       ├── repeat_session.py - interaction with UsersRepeatSession table
@@ -84,13 +94,13 @@ This project uses PostgreSQL for data storage.
 This project depends on Python version 3.12 or higher.
 
 1. Cloning repository
-``` git clone https://github.com/samboed/EnglishCardsTelegramBot ``` 
+```git clone https://github.com/samboed/EnglishCardsTelegramBot ``` 
 
 2. Go to the cloned directory
-``` cd EnglishCardsTelegramBot ``` 
+```cd EnglishCardsTelegramBot ``` 
 
 3. Create virtual environment
-``` python -m venv .venv ``` 
+```python -m venv .venv ``` 
 
 4. Activate virtual environment:
 
@@ -106,11 +116,14 @@ This project depends on Python version 3.12 or higher.
 To use the program, you need a Telegram bot API token.
 
 1. Find @botfather in the Telegram messenger search
+
 ![](images/telegram_bot_token/search_botfather.png)
 2. Start the bot with the /start command
+
 ![](images/telegram_bot_token/start_botfather.png)
 3. Select the /newbot command from the menu
 4. Give a name and username to your bot
+
 ![](images/telegram_bot_token/set_name_username_bot.png)
 5. BotFather will give you a token
 
@@ -118,21 +131,21 @@ To use the program, you need a Telegram bot API token.
 
 ## Running the Program
 
-1. Run main.py from pre-configured virtual environment ``` python main.py```
+1. Run main.py from pre-configured virtual environment ```python main.py```
 
-2. Fill the configuration file setup.ini
+2. Fill the configuration file setup.ini:
 
 ```
 [DATABASE]
-name = database-name
-username = user-name
-password = user-password
+name = database_name
+username = username 
+password = username_password
 
 [TELEGRAM]
-token = token-telegram-bot
+token = token_telegram_bot
 ```
 
-3. Run main.py from pre-configured virtual environment again ``` python main.py```
+3. Run main.py from pre-configured virtual environment again ```python main.py```
 
-## Demonstration
+## Demonstration of the program
 
