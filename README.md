@@ -4,13 +4,13 @@ Telegram bot for learning English words using spaced repetition.
 
 ## Table of contents
   * [Overview](#Overview)
-  * [Project Structure](#Project Structure)
-  * [Database Structure](#Database Structure)
-  * [Setup and Installation](#Setup and Installation)
+  * [Project Structure](#ProjectStructure)
+  * [Database Structure](#DatabaseStructure)
+  * [Setup and Installation](#SetupandInstallation)
     * [PostgreSQL](#PostgreSQL)
     * [Python](#Python)
     * [TelegramBot](#TelegramBot)
-  * [Demonstration of the program](#Demonstration of the program)
+  * [Demonstration of the program](#Demonstrationoftheprogram)
 
 ## Overview
 
@@ -81,71 +81,85 @@ This project uses PostgreSQL for data storage.
 
 1. Installing and setting-up PostgreSQL server following this [guide](https://medium.com/@dan.chiniara/installing-postgresql-for-windows-7ec8145698e3)
 2. Log into the psql client via the terminal using the admin account
-```psql -U <admin_username>```
+   
+   ```$ psql -U <admin_username>```
 
 3. Create new user (optional)
-```CREATE USER username WITH PASSWORD 'username_password';```
+
+   ```postgres=# CREATE USER username WITH PASSWORD 'username_password';```
 
 4. Create database
-```CREATE DATABASE database_name;```
+   
+   ```postgres=# CREATE DATABASE database_name;```
 
 ### Python
 
 This project depends on Python version 3.12 or higher.
 
 1. Cloning repository
-```git clone https://github.com/samboed/EnglishCardsTelegramBot ``` 
+   
+   ```$ git clone https://github.com/samboed/EnglishCardsTelegramBot ``` 
 
 2. Go to the cloned directory
-```cd EnglishCardsTelegramBot ``` 
+   
+   ```$ cd EnglishCardsTelegramBot ``` 
 
 3. Create virtual environment
-```python -m venv .venv ``` 
+   
+   ```$ python -m venv .venv ``` 
 
 4. Activate virtual environment:
 
-* Windows (CMD): ```.venv\Scripts\activate.bat```
-* Windows (PowerShell): ```.venv\Scripts\Activate.ps1```
-* Linux: ```.venv\Scripts\activate```
+* Windows (CMD): ```$ .venv\Scripts\activate.bat```
+* Windows (PowerShell): ```$ .venv\Scripts\Activate.ps1```
+* Linux: ```$ .venv\Scripts\activate```
 
 5. Install requirements
-```pip install -r requirements.txt```
+   
+   ```$ pip install -r requirements.txt```
 
 ### TelegramBot
 
 To use the program, you need a Telegram bot API token.
 
-1. Find @botfather in the Telegram messenger search
+1. Find [@botfather](https://telegram.me/BotFather) in the Telegram messenger search
 
-![](images/telegram_bot_token/search_botfather.png)
-2. Start the bot with the /start command
+   ![](images/telegram_bot_token/search_botfather.png)
 
-![](images/telegram_bot_token/start_botfather.png)
-3. Select the /newbot command from the menu
-4. Give a name and username to your bot
+2. Start the bot with the ```/start``` command
 
-![](images/telegram_bot_token/set_name_username_bot.png)
-5. BotFather will give you a token
+   ![](images/telegram_bot_token/start_botfather.png)
 
-![](images/telegram_bot_token/get_token_bot.png)
+3. Select the ```/newbot``` command from the menu
+4. Give ```name``` and ```username``` to your bot
+
+   ![](images/telegram_bot_token/set_name_username_bot.png)
+
+5. BotFather will give you a ```token```
+
+   ![](images/telegram_bot_token/get_token_bot.png)
 
 ## Running the Program
 
-1. Run main.py from pre-configured virtual environment ```python main.py```
+1. Run main.py from pre-configured virtual environment
 
-2. Fill the configuration file setup.ini:
+   ```$ python main.py```
 
-```
-[DATABASE]
-name = database_name
-username = username 
-password = username_password
+3. Fill the configuration file setup.ini:
 
-[TELEGRAM]
-token = token_telegram_bot
-```
+   ```
+   [DATABASE]
+   name = database_name
+   username = username 
+   password = username_password
+   
+   [TELEGRAM]
+   token = token_telegram_bot
+   ```
 
-3. Run main.py from pre-configured virtual environment again ```python main.py```
+3. Run main.py from pre-configured virtual environment:
+
+   ```$ python main.py```
 
 ## Demonstration of the program
 
