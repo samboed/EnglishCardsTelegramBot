@@ -5,7 +5,8 @@ import logging
 from src.bot.defines import Commands, CallBackData, InlineButtons, WELCOME_TEXT
 from src.bot.service import clear_last_message
 from src.bot.repeat_words import start_guess_words
-from src.bot.collection import show_collection_sum_info, selecting_collection, show_collection_words
+from src.bot.collection import (show_collection_sum_info, selecting_collection,
+                                show_collection_words, convert_words_list_to_str)
 from src.db.users import add_new_user
 from src.db.collection import (add_common_collections_for_user, add_collection_for_user,
                                del_collection, get_available_collections, get_collection_words,
@@ -154,10 +155,7 @@ class Bot:
                 del_repeat_session_data(user_id)
                 add_repeat_session_words(user_id, word_pair_keys_list)
 
-                word_list_text = "\n".join(
-                    [f"\t\t{f'{num_word}.':<3} 🇷🇺 {ru_word:<25}\n"
-                     f"\t\t{f'{' '}':<2} 🇬🇧 {en_word:<25}" for num_word, (ru_word, en_word)
-                     in enumerate(word_pair_list, start=1)])
+                word_list_text = convert_words_list_to_str(word_pair_list)
 
                 inline_button_continue = (
                     telebot.types.InlineKeyboardButton("Продолжить ➡️",
@@ -165,12 +163,10 @@ class Bot:
 
                 markup.add(inline_button_continue, inline_button_back, InlineButtons.main_menu)
 
-                space = "\u2800"
                 message_text = ("Запомните значения следующих слов:\n"
                                f"{word_list_text}")
-                message_text = message_text.replace(' ', space)
 
-                self.__bot.send_message(chat_id, message_text, reply_markup=markup)
+                self.__bot.send_message(chat_id, message_text, reply_markup=markup, parse_mode="HTML")
             else:
                 markup.add(inline_button_back, InlineButtons.main_menu)
 

@@ -17,7 +17,7 @@ def __add_default_collections():
     for file_path in glob.glob(os.path.join(PATH_DEFAULT_COLLECTIONS, f'*.csv')):
         with open(file_path, encoding="utf-8") as table_csv_file:
             reader = csv.reader(table_csv_file, delimiter=";")
-            word_pairs_list = list(reader)
+            word_pairs_list = [(ru_word.lower(), en_word.lower()) for ru_word, en_word in list(reader)]
             collection_name = str(Path(os.path.basename(file_path)).with_suffix('')).strip().lower()
             add_collection(collection_name, ADMIN_USER_ID)
             add_word_pairs(ADMIN_USER_ID, collection_name, word_pairs_list)

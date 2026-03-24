@@ -6,6 +6,14 @@ __MAX_WORD_COLLS_PER_PAGE = 6
 __MAX_SYMBOLS_IN_ONE_MESSAGE = 4096
 
 
+def convert_words_list_to_str(word_pair_list: list[tuple[str,str]]):
+    text = "\n".join([f"⊱{'━' * 11}⊰ {num_word} ⊱{'━' * (12 - len(str(num_word)))}⊰\n"
+                      f"🇷🇺 {ru_word}\n"
+                      f"🇬🇧 {en_word}" for num_word, (ru_word, en_word)
+                      in enumerate(word_pair_list, start=1)])
+    return text
+
+
 def __generate_word_groups_by_rank(word_pairs_ranks: list[tuple[str, str, int]]) \
         -> tuple[list[tuple[str,str]], list[tuple[str,str]], list[tuple[str,str]]]:
     unknown_words = []
@@ -48,18 +56,9 @@ def show_collection_words(bot: telebot.TeleBot, message: telebot.types.Message,
                           collection_name: str) -> telebot.types.Message:
     unknown_words, learned_words, fixed_words = __generate_word_groups_by_rank(word_pairs_ranks)
 
-    unknown_words_text = f"\n" .join(
-        [f"\t\t{f'{num_word}.':<6} 🇷🇺 {ru_word:<25}\n"
-         f"\t\t{f'{' '}':<5} 🇬🇧 {en_word:<25}" for num_word, (ru_word, en_word)
-         in enumerate(unknown_words, start=1)])
-    learned_words_text = "\n".join(
-        [f"\t\t{f'{num_word}.':<6} 🇷🇺 {ru_word:<20}\n"
-         f"\t\t{f'{' '}':<5} 🇬🇧 {en_word:<15}" for num_word, (ru_word, en_word)
-         in enumerate(learned_words, start=1)])
-    fixed_words_text = "\n".join(
-        [f"\t\t{f'{num_word}.':<6} 🇷🇺 {ru_word:<20}\n"
-         f"\t\t{f'{' '}':<5} 🇬🇧 {en_word:<15}" for num_word, (ru_word, en_word)
-         in enumerate(fixed_words, start=1)])
+    unknown_words_text = convert_words_list_to_str(unknown_words)
+    learned_words_text = convert_words_list_to_str(learned_words)
+    fixed_words_text = convert_words_list_to_str(fixed_words)
 
     if not unknown_words_text :
         unknown_words_text = "\t\t~"
@@ -68,14 +67,13 @@ def show_collection_words(bot: telebot.TeleBot, message: telebot.types.Message,
     if not fixed_words_text :
         fixed_words_text = "\t\t~"
 
-    space = "\u2800"
     message_text = (f"Список слов сборника <b>«{collection_name.capitalize()}»</b>:\n"
                     f"- Доступно для изучения:\n"
                     f"{unknown_words_text}\n"
                     f"- Изученные:\n"
                     f"{learned_words_text}\n"
                     f"- Освоенные:\n"
-                    f"{fixed_words_text}\n").replace(' ', space)
+                    f"{fixed_words_text}\n")
 
     cur_message_first_sym_ind = 0
     len_message_text = len(message_text)
