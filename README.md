@@ -4,13 +4,13 @@ Telegram bot for learning English words using spaced repetition.
 
 ## Table of contents
   * [Overview](#Overview)
-  * [Project Structure](#ProjectStructure)
-  * [Database Structure](#DatabaseStructure)
-  * [Setup and Installation](#SetupandInstallation)
+  * [Project Structure](#Project-Structure)
+  * [Database Structure](#Database-Structure)
+  * [Setup and Installation](#Setup-and-Installation)
     * [PostgreSQL](#PostgreSQL)
     * [Python](#Python)
     * [TelegramBot](#TelegramBot)
-  * [Demonstration of the program](#Demonstrationoftheprogram)
+  * [Demonstration of the program](#Demonstration-of-the-program)
 
 ## Overview
 
