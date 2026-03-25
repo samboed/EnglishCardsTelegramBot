@@ -163,6 +163,6 @@ To use the program, you need a Telegram bot API token.
 
 ## Demonstration of the program
 
-[Watch](https://www.youtube.com/watch?v=ZCDoOLdQH0Y)
+[Watch on YouTube](https://www.youtube.com/watch?v=ZCDoOLdQH0Y)
 
 
