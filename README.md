@@ -110,9 +110,9 @@ This project depends on Python version 3.12 or higher.
 
 4. Activate virtual environment:
 
-* Windows (CMD): ```$ .venv\Scripts\activate.bat```
-* Windows (PowerShell): ```$ .venv\Scripts\Activate.ps1```
-* Linux: ```$ .venv\Scripts\activate```
+* Windows (CMD): ```> .venv\Scripts\activate.bat```
+* Windows (PowerShell): ```> .venv\Scripts\Activate.ps1```
+* Linux: ```$ source .venv\Scripts\activate```
 
 5. Install requirements
    
